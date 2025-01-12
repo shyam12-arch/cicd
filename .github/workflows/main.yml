@@ -19,14 +19,14 @@ jobs:
     - name: Copy Files to EC2
       run: |
         scp -o StrictHostKeyChecking=no -i private_key.pem \
-          Dockerfile src ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
+          Dockerfile src ubuntu@ec2-${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/
 
     - name: Build and Run Docker on EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-        cd /home/ec2-user/
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ubuntu@ec2-${{ secrets.EC2_PUBLIC_IP }}.compute-1.amazonaws.com << 'EOF'
+        cd /home/ubuntu/
         docker build -t my-python-app .
-        docker run -d --name my-python-app-container -p 80:80 my-python-app
+        docker run -d -p 80:80 my-python-app
         EOF
 
     - name: Clean Up
