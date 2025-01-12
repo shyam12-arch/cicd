@@ -19,7 +19,7 @@ jobs:
     - name: Copy Files to EC2
       run: |
         scp -o StrictHostKeyChecking=no -i private_key.pem \
-          Dockerfile src ubuntu@ec2-${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/
+          Dockerfile app.py ubuntu@ec2-${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/
 
     - name: Build and Run Docker on EC2
       run: |
