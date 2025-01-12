@@ -11,20 +11,24 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+    - name: Set up SSH Key
+      run: |
+        echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
 
     - name: Copy Files to EC2
       run: |
-        scp -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} \
+        scp -o StrictHostKeyChecking=no -i private_key.pem \
           Dockerfile my_python_file.py ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
 
     - name: Build and Run Docker on EC2
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
         cd /home/ec2-user/
         docker build -t my-python-app .
-        docker run -d --name my-python-app-container -p 80:80 my-python-app
+        docker run -d --name my-python-app-container -p 8080:8080 my-python-app
         EOF
+
+    - name: Clean Up
+      run: |
+        rm -f private_key.pem
