@@ -5,8 +5,8 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy the contents of the src directory into the container
-COPY src/ ./src/
+COPY . .
 
 # Set the default command to execute the app
-CMD ["python", "src/app.py"]
+CMD ["python", "app.py"]
 
